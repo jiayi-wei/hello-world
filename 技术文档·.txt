@@ -1,0 +1,57 @@
+源码文件：
+LaneDetector.h
+LaneDetector.cpp
+
+算法实现思路：
+1、在读取一个新的视频时在第一帧针对此视频的画面大小进行初始化。
+	所初始化的内容是针对本视频我们所截取的ROI的位置与尺寸。之
+	所以进行这一步工作，是因为我们的代码应用的场景是在公路上，
+	而路的内容均处于画面下方的固定位置，所以探测算法只针对截取
+	出来的图像进行操作减少了不必要的计算，并且减少了整体画面中
+	其他位置所带来的不必要干扰，有助于提算法性能。
+2、首先判断上一帧中获得的车道线信息是否符合判断变道的要求，如
+	果符合要求在画面中显示Changing Left/Right Lane的字样，并在
+	接下来50帧中均跳过之后的探测过程，直接显示。
+3、对于进来的每一帧画面中的ROI，对于画面中的线段进行探测，获得
+	全部的线段信息。而后将所有不符合车道线实际情况的删除。保留
+	符合要求的线段，并且线段用斜率（k）和截距（b)进行表示。
+4、当前帧中所获得的线段信息和之前4帧的线段信息一同在投票矩阵
+	(mat_vote)中进行得分表决，得分最高的点为最终输出的线段信息，
+	存储在四维向量(k_b_mean)。
+5、如果最终的结果符合要求，在进行卡尔曼滤波后，将线段画在原图上
+	进行显示。其余所有上述不符合要求的情况，直接显示原图。
+6、如果k_b_mean的波动范围足够小，稳定计数器（stable_count）加一。当
+	计数器数值大于20时，线段检测进入稳定检测方式，算法上有细小变化，
+	但整体的思路和不稳定状态相同。同样，在两个检测状态中，只要出现
+	k_b_mean较大幅度变化，计数器清零。
+	
+接口函数：
+
+run_lane_detection(const Mat& img, const Mat& vd_img)
+run_lane_detection相当于外部需求与类内实现的桥梁，动作序列如下：
+1、对于所输入的图片，首先判断是否符合变线的判决条件，满足则进入变线的显示方式。
+	判别条件是"atan(m_k_mean[0])<-PI/3 && atan(m_k_mean[2]<PI/3"为左方变道；
+	"atan(m_k_mean[0])>-PI/3 && atan(m_k_mean[2]>PI/3"为右方变道。
+2、如不符合变线，则通过调用类内的其他函数模块完成算法实现的所有步骤。判断是否
+	进入stable状态后依次调用：detect_line()\detect_lines_onstable()、
+	filter_lines()、vote_lines\vote_lines_onstable()之后获得本真图像的
+	k_b_mean。判断k_b_mean符合要求，不符合直接显示原图像，符合的通过
+	kalmanfilter_processing（）获得滤波后k_b_mean数据。最后用draw_lanes（）
+	展示标出车道线的图像。
+3、最后不论是否处于stable状态，将本帧获得k_b_mean与上一帧进行比对，波动较小则
+	stable状态保持或者m_stable_count；波动较大则m_stable_count归零。
+	
+detect_lines(const Mat& img, vector<line_info>& line_detection)
+detect_lines用于不稳定状态下图片内线段检测，动作序列如下：
+1、利用Opencv自带的Ptr<LineSegmentDetector>对图像中的线段进行探测，建立一个
+	容器”vector<Vec4f> lines“存放“detector->detect(img_gray, lines)”所有探
+	测到的线段。
+2、对lines中的所有线段进行筛选，线段长度小于10、线段倾斜角度不是车道线的
+	角度以及的所有线段均舍去。其余符合条件的存入容器vector<line_info>& line_detection。
+  注：line_info是存储线段信息的结构体变量。line_info中包括：起点(start_point)、
+	终点(end_point)、斜率(line_slope_k)、截距(line_x_b)、以及长度(line_distance)信息。
+	
+filter_lines(const Mat& img,vector<Vec2f>& line_fitting_info, vector<line_info>& line_detection)	
+filter_lines将大体处于同于一条线上的小线段进行整合，动作序列如下：
+
+
