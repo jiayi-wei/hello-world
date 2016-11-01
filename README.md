@@ -4,14 +4,4 @@ this is readme
 this is just a try.
 
 
-连接特定的 DNS 后缀 . . . . . . . : bupt.edu.cn
-   IPv6 地址 . . . . . . . . . . . . : 2001:da8:215:202:5df1:afff:fc98:f42
-   临时 IPv6 地址. . . . . . . . . . : 2001:da8:215:202:870:628d:825a:f7d1
-   临时 IPv6 地址. . . . . . . . . . : 2001:da8:215:202:2828:a081:561:413d
-   临时 IPv6 地址. . . . . . . . . . : 2001:da8:215:202:30c3:2b3d:2130:b803
-   临时 IPv6 地址. . . . . . . . . . : 2001:da8:215:202:fda3:8b32:25c1:2d59
-   本地链接 IPv6 地址. . . . . . . . : fe80::5df1:afff:fc98:f42%3
-   IPv4 地址 . . . . . . . . . . . . : 10.102.9.134
-   子网掩码  . . . . . . . . . . . . : 255.255.252.0
-   默认网关. . . . . . . . . . . . . : fe80::eda:41ff:fe12:f7e9%3
-                                       10.102.8.1
+http://www.hankcs.com/ml/the-logistic-regression-and-the-maximum-entropy-model.html
