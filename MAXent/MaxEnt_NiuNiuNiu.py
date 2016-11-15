@@ -126,9 +126,8 @@ class Max_Niu:
         for lamda_ in range(0, 100):
             lamda = lamda_ / 100.0
             sum_front = 0.0
-            ZX = self._zx_lamda(X, lamda)
-            for x in X:
-                sum_front += 1.0 / self._N * math.log(ZX) 
+            ZX = self._zx_lamda(self._X, lamda)
+            sum_front += 1.0 / self._N * math.log(ZX) 
             sum_back = 0.0
             for i, xy in enumerate(self._numXY):
                 sum_back += self._numXY[xy] * 1.0 / self._N * (self._w[0, self._xyID[xy]] + lamda * self._p[0, self._xyID[xy]])
@@ -170,6 +169,6 @@ if __name__ == "__main__":
     maxent.load_data('data.txt')
     maxent.train()
     print(maxent.predict("sunny\thot\thigh\tFALSE"))
-    print(maxent.predict("overcast\thot\thigh\tFALSE"))
     print(maxent.predict("sunny\tcool\thigh\tTRUE"))
+    print(maxent.predict("overcast\thot\thigh\tFALSE"))
     print(maxent.predict("sunny\tcool\thigh\tFALSE"))

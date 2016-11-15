@@ -1,17 +1,17 @@
 import sys
 import math
 import time
-from collections import defaultdict
+import collections
  
 class MaxEnt:
     def __init__(self):
         self._samples = [] 	    #样本集, 元素是[y,x1,x2,...,xn]的元组
         self._Y = set([])       #标签集合,相当于去重之后的y
-        self._numXY = defaultdict(int)  #Key是(xi,yi)对，Value是count(xi,yi)
+        self._numXY = collections.defaultdict(int)  #Key是(xi,yi)对，Value是count(xi,yi)
         self._N = 0		    #样本数量
         self._n = 0		    #特征对(xi,yi)总数量
         self._xyID = {}	    #对(x,y)对做的顺序编号(ID), Key是(xi,yi)对,Value是ID
-        self._C = 0		    #样本最大的特征数量,用于求参数时的迭代，见IIS原理说明
+        self._M = 0		    #样本最大的特征数量,用于求参数时的迭代，见IIS原理说明
         self._ep_ = []		#样本分布的特征期望值
         self._ep = []		#模型分布的特征期望值
         self._w = []		#对应n个特征的权值
@@ -31,7 +31,7 @@ class MaxEnt:
     def _initparams(self):
         self._N = len(self._samples)
         self._n = len(self._numXY)
-        self._C = max([len(sample) - 1 for sample in self._samples])
+        self._M = max([len(sample) - 1 for sample in self._samples])
         self._w = [0.0] * self._n
         self._lastw = self._w[:]
         self._sample_ep()
@@ -87,7 +87,7 @@ class MaxEnt:
             #更新每个特征的权值
             for i, w in enumerate(self._w):
                 #参考公式(19)
-                self._w[i] += 1.0 / self._C * math.log(self._ep_[i] / self._ep[i])
+                self._w[i] += 1.0 / self._M * math.log(self._ep_[i] / self._ep[i])
             #print(self._w)
             #time.sleep(1)
             #检查是否收敛	
@@ -105,6 +105,6 @@ if __name__ == "__main__":
     print(maxent.predict("sunny\thot\thigh\tFALSE"))
     print(maxent.predict("overcast\thot\thigh\tFALSE"))
     print(maxent.predict("sunny\tcool\thigh\tTRUE"))
-    #print(maxent.predict("sunny\tcool\thigh\tFALSE"))
+    print(maxent.predict("sunny\tcool\thigh\tFALSE"))
     
     sys.exit(0)
